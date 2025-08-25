@@ -1,49 +1,49 @@
-# Contribution Tracking System
+# CLI Contribution Tracker
 
-A command-line application for tracking contributions from members, volunteers, and donors of an organization.
+This is a **CLI (Command-Line Interface)** and **ORM (Object-Relational Mapper)** application built in Python. It's designed to solve the real-world problem of tracking contributions from various individuals to an organization. The project demonstrates core software development practices, including database management, modular design, and user interaction through a command-line interface.
 
-## Features
+-----
 
-- Manage organizations, contributors, and contributions
-- Track contributions with dates, amounts, and notes
-- Generate reports on contributions by type and date range
-- Create thank you messages for contributors
-- Data persistence using SQLite database
+### Learning Goals
 
-## Installation
+This project was developed to achieve several key learning goals:
 
-1. Clone this repository
-2. Install dependencies: `pipenv install`
-3. Activate the virtual environment: `pipenv shell`
-4. Run the application: `python debug.py`
+  * **CLI Application Design**: The application uses a well-structured CLI to provide a user-friendly way to interact with the system without a graphical interface.
+  * **SQLAlchemy ORM**: It utilizes SQLAlchemy to create and manage a database. This demonstrates how to interact with a database using Python objects instead of raw SQL queries, making the code more readable and maintainable. The application features three interconnected tables (`organizations`, `contributors`, and `contributions`), showcasing a **one-to-many relationship**.
+  * **Modular Code Structure**: The project adheres to best practices by organizing the code into logical directories (`lib/`, `models/`, etc.). This separation of concerns improves readability and makes the code easier to debug and extend.
+  * **Data Structures**: The application effectively uses Python's built-in data structures, such as **lists**, **dicts**, and **tuples**, to handle and manipulate data retrieved from the database or provided by the user.
 
-## Usage
+-----
 
-The application provides a menu-driven interface with the following options:
+### Getting Started
 
-1. **Manage Contributors**: View, add, find, or delete contributors
-2. **Manage Contributions**: View, add, find, or delete contributions
-3. **View Reports**: Generate reports on contributions by type or date range
-4. **Thank Contributors**: Generate thank you messages for recent contributors
-5. **Exit**: Exit the application
+#### Prerequisites
 
-## Data Model
+  * Python 3.6 or newer.
+  * The **SQLAlchemy** library.
 
-The application uses three main models:
+#### Installation
 
-1. **Organization**: Represents the organization receiving contributions
-2. **Contributor**: Represents individuals who contribute (members, volunteers, donors)
-3. **Contribution**: Represents individual contributions with amount, date, and notes
+1.  **Clone or download** the project files.
+2.  **Navigate** to the project's root directory in your terminal.
+3.  **Install the required library** using `pip`:
+    ```bash
+    pip install sqlalchemy
+    ```
 
-## Relationships
+-----
 
-- An Organization has many Contributors (one-to-many)
-- A Contributor has many Contributions (one-to-many)
+### Usage
 
-## Validation
+1.  **Run the application** from the project's root directory:
+    ```bash
+    python3 main.py
+    ```
+2.  The program will automatically create a **SQLite database file** named `contributions.db` on its first run.
+3.  Use the **on-screen menus** to add, view, and manage organizations, contributors, and their contributions.
 
-The application includes validation for:
-- Contributor type (must be member, volunteer, or donor)
-- Contribution amount (must be greater than 0)
-- Date format validation
-- Input type validation for numbers and dates
+-----
+
+### Technical Communication
+
+The project's code is well-commented and its structure is logical, making it easy to understand the technical concepts behind it. The use of an ORM simplifies database interactions, allowing for clear and concise code when performing CRUD (Create, Read, Update, Delete) operations. The menu-driven CLI provides a direct and accurate demonstration of the application's functionality.
