@@ -2,19 +2,21 @@ from .models.organization import Organization
 from .models.contributor import Contributor
 from .models.contribution import Contribution
 from .helpers import (
-    display_menu, 
-    get_int_input, 
-    get_float_input, 
-    get_date_input, 
-    clear_screen, 
-    print_success, 
-    print_error, 
-    print_warning
+    display_menu,
+    get_int_input,
+    get_float_input,
+    get_date_input,
+    clear_screen,
+    print_success,
+    print_error,
+    print_warning,
+    print_table  
 )
+
 
 class CLI:
     """A command-line interface for the contributions management system."""
-    
+
     def __init__(self):
         self.running = True
 
@@ -59,7 +61,8 @@ class CLI:
                 name = input("Enter organization name: ")
                 contact = input("Enter contact info: ")
                 org = Organization.create(name, contact)
-                print_success(f"Organization '{org.name}' created with ID {org.id}.")
+                print_success(
+                    f"Organization '{org.name}' created with ID {org.id}.")
             elif choice == 2:
                 self.list_organizations()
             elif choice == 3:
@@ -76,21 +79,21 @@ class CLI:
             input("\nPress Enter to continue...")
 
     def list_organizations(self):
-        """Lists all organizations in the database."""
+        """Lists all organizations in the database using a formatted table."""
         organizations = Organization.get_all()
-        if not organizations:
-            print_warning("No organizations found.")
-            return
-        print("\n--- All Organizations ---")
-        for org in organizations:
-            print(f"ID: {org.id}, Name: {org.name}, Contact: {org.contact_info}")
+        table_data = [
+            {"ID": org.id, "Name": org.name, "Contact": org.contact_info}
+            for org in organizations
+        ]
+        print_table(table_data, headers="keys", title="All Organizations")
 
     def delete_organization(self):
         """Handles the deletion of an organization."""
         self.list_organizations()
         org_id = get_int_input("Enter ID of organization to delete: ")
         if Organization.delete(org_id):
-            print_success(f"Organization with ID {org_id} deleted successfully.")
+            print_success(
+                f"Organization with ID {org_id} deleted successfully.")
         else:
             print_error("Organization not found.")
 
@@ -130,7 +133,8 @@ class CLI:
                 else:
                     print_error("Contributor not found.")
             elif choice == 5:
-                cont_type = input("Enter contributor type ('member', 'volunteer', 'donor'): ")
+                cont_type = input(
+                    "Enter contributor type ('member', 'volunteer', 'donor'): ")
                 contributors = Contributor.find_by_type(cont_type)
                 if contributors:
                     for cont in contributors:
@@ -146,40 +150,58 @@ class CLI:
             input("\nPress Enter to continue...")
 
     def add_contributor(self):
-        """Handles the addition of a new contributor."""
+        """
+        Handles the addition of a new contributor.
+        Presents a numbered list for the contributor's type.
+        """
         first = input("Enter first name: ")
         last = input("Enter last name: ")
         contact = input("Enter contact info: ")
-        cont_type = input("Enter type ('member', 'volunteer', 'donor'): ")
-        
+
+        # Define the list of valid contributor types
+        contributor_types = ["member", "volunteer", "donor"]
+
+        # Use a numbered menu to get the user's choice
+        choice = display_menu("Select Contributor Type", contributor_types)
+
+        # Use the choice to select the correct type string from the list
+        cont_type = contributor_types[choice - 1]
+
         self.list_organizations()
         org_id = get_int_input("Enter organization ID for this contributor: ")
-        target_amount = get_float_input("Enter target contribution amount (optional, defaults to 0): ", min_val=0)
-        
+        target_amount = get_float_input(
+            "Enter target contribution amount (optional, defaults to 0): ", min_val=0)
+
         try:
-            cont = Contributor.create(first, last, contact, cont_type, org_id, target_amount)
-            print_success(f"Contributor '{cont.full_name}' created with ID {cont.id}.")
+            cont = Contributor.create(
+                first, last, contact, cont_type, org_id, target_amount)
+            print_success(
+                f"Contributor '{cont.full_name}' created with ID {cont.id}.")
         except ValueError as e:
             print_error(f"Error creating contributor: {e}")
 
     def list_contributors(self):
-        """Lists all contributors with their details, including progress."""
+        """Lists all contributors with their details using a formatted table."""
         contributors = Contributor.get_all()
-        if not contributors:
-            print_warning("No contributors found.")
-            return
-        print("\n--- All Contributors ---")
-        for cont in contributors:
-            print(f"ID: {cont.id}, Name: {cont.full_name}, Type: {cont.type}")
-            print(f"  Target: ${cont.target_amount:.2f}, Total Contributions: ${cont.total_contributions:.2f}")
-            print(f"  Progress: {cont.progress_percentage:.2f}%")
-    
+        table_data = [
+            {
+                "ID": cont.id,
+                "Name": cont.full_name,
+                "Type": cont.type,
+                "Target ($)": f"{cont.target_amount:.2f}",
+                "Contributed ($)": f"{cont.total_contributions:.2f}",
+                "Progress (%)": f"{cont.progress_percentage:.2f}"
+            }
+            for cont in contributors
+        ]
+        print_table(table_data, headers="keys", title="All Contributors")
+
     def update_contributor_target(self):
         """Updates the target contribution amount for a contributor."""
         self.list_contributors()
         cont_id = get_int_input("Enter ID of contributor to update: ")
         new_target = get_float_input("Enter new target amount: ", min_val=0)
-        
+
         if Contributor.update_target_amount(cont_id, new_target):
             print_success("Target amount updated successfully.")
         else:
@@ -190,7 +212,8 @@ class CLI:
         self.list_contributors()
         cont_id = get_int_input("Enter ID of contributor to delete: ")
         if Contributor.delete(cont_id):
-            print_success(f"Contributor with ID {cont_id} deleted successfully.")
+            print_success(
+                f"Contributor with ID {cont_id} deleted successfully.")
         else:
             print_error("Contributor not found.")
 
@@ -228,22 +251,27 @@ class CLI:
         cont_id = get_int_input("Enter contributor ID: ")
         amount = get_float_input("Enter contribution amount: ", min_val=0.01)
         notes = input("Enter notes (optional): ")
-        
+
         try:
             contribution = Contribution.create(amount, cont_id, notes)
-            print_success(f"Contribution of ${contribution.amount:.2f} recorded for Contributor {cont_id}.")
+            print_success(
+                f"Contribution of ${contribution.amount:.2f} recorded for Contributor {cont_id}.")
         except ValueError as e:
             print_error(f"Error recording contribution: {e}")
 
     def list_contributions(self):
-        """Lists all contributions in the database."""
+        """Lists all contributions in the database using a formatted table."""
         contributions = Contribution.get_all()
-        if not contributions:
-            print_warning("No contributions found.")
-            return
-        print("\n--- All Contributions ---")
-        for c in contributions:
-            print(f"ID: {c.id}, Amount: ${c.amount:.2f}, Date: {c.date}, Contributor ID: {c.contributor_id}")
+        table_data = [
+            {
+                "ID": c.id,
+                "Amount ($)": f"{c.amount:.2f}",
+                "Date": c.date,
+                "Contributor ID": c.contributor_id
+            }
+            for c in contributions
+        ]
+        print_table(table_data, headers="keys", title="All Contributions")
 
     def find_contributions_by_contributor(self):
         """Finds and lists contributions for a specific contributor."""
@@ -251,9 +279,10 @@ class CLI:
         cont_id = get_int_input("Enter contributor ID: ")
         contributions = Contribution.find_by_contributor(cont_id)
         if contributions:
-            print(f"--- Contributions for Contributor {cont_id} ---")
+            print_success(f"--- Contributions for Contributor {cont_id} ---")
             for c in contributions:
-                print(f"ID: {c.id}, Amount: ${c.amount:.2f}, Date: {c.date}, Notes: {c.notes}")
+                print(
+                    f"ID: {c.id}, Amount: ${c.amount:.2f}, Date: {c.date}, Notes: {c.notes}")
         else:
             print_warning("No contributions found for this contributor.")
 
@@ -263,12 +292,13 @@ class CLI:
         start_date = get_date_input()
         print("Enter end date.")
         end_date = get_date_input()
-        
+
         contributions = Contribution.find_by_date_range(start_date, end_date)
         if contributions:
             print(f"--- Contributions from {start_date} to {end_date} ---")
             for c in contributions:
-                print(f"ID: {c.id}, Amount: ${c.amount:.2f}, Date: {c.date}, Contributor ID: {c.contributor_id}")
+                print(
+                    f"ID: {c.id}, Amount: ${c.amount:.2f}, Date: {c.date}, Contributor ID: {c.contributor_id}")
         else:
             print_warning("No contributions found in this date range.")
 
@@ -277,7 +307,8 @@ class CLI:
         self.list_contributions()
         cont_id = get_int_input("Enter ID of contribution to delete: ")
         if Contribution.delete(cont_id):
-            print_success(f"Contribution with ID {cont_id} deleted successfully.")
+            print_success(
+                f"Contribution with ID {cont_id} deleted successfully.")
         else:
             print_error("Contribution not found.")
 
@@ -299,19 +330,15 @@ class CLI:
     def show_contributor_progress_report(self):
         """Generates and displays a report on contributor progress towards their target."""
         contributors = Contributor.get_all()
-        if not contributors:
-            print_warning("No contributors found to generate report.")
-            return
+        table_data = [
+            {
+                "Name": cont.full_name,
+                "Total Contrib. ($)": f"{cont.total_contributions:.2f}",
+                "Target ($)": f"{cont.target_amount:.2f}",
+                "Progress (%)": f"{cont.progress_percentage:.2f}"
+            }
+            for cont in contributors
+        ]
+        print_table(table_data, headers="keys",
+                    title="Contributor Progress Report")
 
-        print("\n--- Contributor Progress Report ---")
-        print("{:<25} {:<15} {:<15} {:<15}".format("Name", "Total Contrib.", "Target", "Progress %"))
-        print("-" * 70)
-        for cont in contributors:
-            print(
-                "{:<25} ${:<14.2f} ${:<14.2f} {:<15.2f}".format(
-                    cont.full_name, 
-                    cont.total_contributions, 
-                    cont.target_amount, 
-                    cont.progress_percentage
-                )
-            )

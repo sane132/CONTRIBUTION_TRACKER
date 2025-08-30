@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from tabulate import tabulate 
 
 def display_menu(title, options):
     """Displays a menu and gets a valid integer choice from the user."""
@@ -62,3 +63,18 @@ def print_error(message):
 def print_warning(message):
     """Prints a message in yellow color."""
     print(f"\033[93m{message}\033[0m")
+
+def print_table(data, headers, title=None):
+    """Prints data in a formatted table."""
+    if title:
+        print(f"\n--- {title} ---")
+    if not data:
+        print_warning("No data found.")
+        return
+    
+    # Ensure data is a list of dictionaries
+    if isinstance(data[0], dict):
+        print(tabulate(data, headers="keys", tablefmt="fancy_grid"))
+    else:
+        # Fallback for other formats
+        print(tabulate(data, headers=headers, tablefmt="fancy_grid"))

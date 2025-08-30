@@ -2,7 +2,6 @@
 
 This is a **CLI (Command-Line Interface)** and **ORM (Object-Relational Mapper)** application built in Python. It's designed to solve the real-world problem of tracking contributions from various individuals to an organization. The project demonstrates core software development practices, including database management, modular design, and user interaction through a command-line interface.
 
------
 
 ### Learning Goals
 
@@ -13,7 +12,7 @@ This project was developed to achieve several key learning goals:
   * **Modular Code Structure**: The project adheres to best practices by organizing the code into logical directories (`lib/`, `models/`, etc.). This separation of concerns improves readability and makes the code easier to debug and extend.
   * **Data Structures**: The application effectively uses Python's built-in data structures, such as **lists**, **dicts**, and **tuples**, to handle and manipulate data retrieved from the database or provided by the user.
 
------
+
 
 ### Getting Started
 
@@ -31,7 +30,7 @@ This project was developed to achieve several key learning goals:
     pip install sqlalchemy
     ```
 
------
+
 
 ### Usage
 
@@ -42,7 +41,7 @@ This project was developed to achieve several key learning goals:
 2.  The program will automatically create a **SQLite database file** named `contributions.db` on its first run.
 3.  Use the **on-screen menus** to add, view, and manage organizations, contributors, and their contributions.
 
------
+
 
 ### Technical Communication
 
